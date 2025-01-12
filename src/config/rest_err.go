@@ -29,6 +29,7 @@ type Causes struct {
 	Field string `json:"field" example:"name"`
 
 	// Error message describing the cause.
+	// @json
 	// @jsonTag message
 	Message string `json:"message" example:"name is required"`
 }
