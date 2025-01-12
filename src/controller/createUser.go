@@ -1,20 +1,22 @@
 package controller
 
-import 
-    "github.com/gin-gonic/gin"
+import (
+	"fmt"
 
+	"github.com/allanVvz/GoCRUD/src/config/rest_err"
+	"github.com/allanVvz/GoCRUD/src/model/request"
+	"github.com/gin-gonic/gin"
 )
 
 func createUser(c *gin.Context) {
 
-    var userRequest request.UserRequest
-    
-    
-    if err := c.ShouldBindJSON(&userRequest); err!= nil {
-        restErr := NewBadRequestError(
-            fmt.Sprintf("Invalid JSON body, there are some incorrect fields: %s \n", err.))
-            c.JSON(restErr.Code, restErr)
-            return
-    }
-}
+	var userRequest request.UserRequest
 
+	if err := c.ShouldBindJSON(&userRequest); err != nil {
+		restErr := rest_err.NewBadRequestError(
+			fmt.Sprintf("Invalid JSON body, there are some incorrect fields: %s ", err.Error()))
+		c.JSON(restErr.Code, restErr)
+		return
+	}
+	fmt.Println(userRequest)
+}
