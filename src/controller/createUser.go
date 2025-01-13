@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/allanVvz/GoCRUD/src/config/rest_err"
-	"github.com/allanVvz/GoCRUD/src/model/request"
+	"github.com/allanVvz/GoCRUD/src/controller/model/request"
 	"github.com/gin-gonic/gin"
 )
 

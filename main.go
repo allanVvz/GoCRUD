@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-
 	"github.com/allanVvz/GoCRUD/src/controller/routes"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
@@ -16,8 +15,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 
 	}
-	routes := gin.Default()
-
+	
+	router := gin.Default()
 
 	routes.InitRoutes(&router.RouterGroup)
 
