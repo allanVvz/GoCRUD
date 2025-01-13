@@ -5,6 +5,8 @@ import (
 	"log"
 	"os"
 
+	"github.com/allanVvz/GoCRUD/src/controller/routes"
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 )
 
@@ -14,5 +16,13 @@ func main() {
 		log.Fatal("Error loading .env file")
 
 	}
-	fmt.Println(os.Getenv("Hello, World!"))
+	routes := gin.Default()
+
+
+	routes.InitRoutes(&router.RouterGroup)
+
+	if err := router.Run(":8080"); err != nil {
+		fmt.Println("Error starting server")
+		os.Exit(1)
+	}
 }
