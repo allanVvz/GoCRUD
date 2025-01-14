@@ -7,10 +7,10 @@ import (
 
 func InitRoutes(r *gin.RouterGroup) {
 
-	r.GET("/getUserById/:userId", controller.FindUserById)
-	r.GET("/getUserByEmail/:userEmail", controller.FindUserByEmail)
-	r.POST("/createUser", controller.CreateUser)
-	r.PUT("/updateUser/:userId", controller.UpdateUser)
-	r.DELETE("/deleteUser/:userId", controller.DeleteUser)
+	r.GET("/getUserById/:userId", controller.FindDriverById)
+	r.GET("/getDriverByEmail/:DriverEmail", controller.FindDriverByReg)
+	r.POST("/createDriver", controller.CreateDriver)
+	r.PUT("/updateDriver/:driverId", controller.UpdateDriver)
+	r.DELETE("/deleteDriver/:driverId", controller.DeleteDriver)
 
 }

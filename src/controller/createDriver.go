@@ -8,9 +8,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func CreateUser(c *gin.Context) {
+func CreateDriver(c *gin.Context) {
 
-	var userRequest request.UserRequest
+	var userRequest request.DriverRequest
 
 	if err := c.ShouldBindJSON(&userRequest); err != nil {
 		restErr := rest_err.NewBadRequestError(
