@@ -1,9 +1,16 @@
 package controller
 
-import "github.com/gin-gonic/gin"
+import (
+	"fmt"
+
+	"github.com/gin-gonic/gin"
+)
 
 func UpdateDriver(c *gin.Context) {
 }
 
-func DeleteDriver(C *gin.Context) {
+func RemoveDriver(c *gin.Context) {
+	fmt.Println("RemoceDriver")
 }
+
+
