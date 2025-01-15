@@ -7,10 +7,11 @@ import (
 )
 
 func UpdateVehicle(c *gin.Context) {
+	fmt.Println("UpdateVehicle")
 
-	fmt.Println("CreateVehicle")
 }
 
-func RemoveVehicle(c *gin.Context) {
-	fmt.Println("RemoveDriver")
+func DesibleVehicle(c *gin.Context) {
+	fmt.Println("DesibleVehicle")
+
 }

@@ -7,10 +7,11 @@ import (
 )
 
 func UpdateDriver(c *gin.Context) {
+	fmt.Println("UpdateDriver")
 }
 
-func RemoveDriver(c *gin.Context) {
-	fmt.Println("RemoceDriver")
+func FireDriver(c *gin.Context) {
+	fmt.Println("RemoveDriver")
 }
 
 
