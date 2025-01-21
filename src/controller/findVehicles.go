@@ -7,7 +7,7 @@ import (
 )
 
 func FindVehicleById(c	*gin.Context){
-	fmt.Println("FindVehicleById") {
+	fmt.Println("FindVehicleById") 
 
 }
 

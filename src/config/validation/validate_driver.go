@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	validate = validator.New()
+	Validate = validator.New()
 	transl   ut.Translator
 )
 
@@ -23,31 +23,31 @@ func init() {
 		unt := ut.New(en, en)
 		transl, _ = unt.GetTranslator("en")
 		en_translation.RegisterDefaultTranslations(val, transl)
-
 	}
 }
 
-func ValidateUserError(
-	validation_err error,
+func ValidateDriverError(
+	validationErr error,
 ) *rest_err.RestErr {
 
 	var jsonErr *json.UnmarshalTypeError
-	var jsonValidationErr validator.ValidationErrors
+	var jsonValidationError validator.ValidationErrors
 
-	if errors.As(validation_err, &jsonErr) {
-		return rest_err.NewBadRequestError("Erro de tipo")
-	} else if errors.As(validation_err, &jsonValidationErr) {
+	if errors.As(validationErr, &jsonErr) {
+		return rest_err.NewBadRequestError("Invalid field type")
+	} else if errors.As(validationErr, &jsonValidationError) {
 		errorsCauses := []rest_err.Causes{}
 
-		for _, e := range validation_err.(validator.ValidationErrors) {
+		for _, e := range validationErr.(validator.ValidationErrors) {
 			cause := rest_err.Causes{
 				Message: e.Translate(transl),
 				Field:   e.Field(),
 			}
 			errorsCauses = append(errorsCauses, cause)
 		}
-		return rest_err.NewBadRequestValidationError("Algum campo está errado", errorsCauses)
+
+		return rest_err.NewBadRequestValidationError("Some fields are invalid", errorsCauses)
 	} else {
-		return rest_err.NewBadRequestError("Erro de validação")
+		return rest_err.NewBadRequestError("Error trying to convert fields")
 	}
 }

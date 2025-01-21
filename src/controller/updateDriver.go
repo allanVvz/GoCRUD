@@ -13,5 +13,3 @@ func UpdateDriver(c *gin.Context) {
 func FireDriver(c *gin.Context) {
 	fmt.Println("RemoveDriver")
 }
-
-

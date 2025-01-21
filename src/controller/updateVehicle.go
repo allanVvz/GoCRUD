@@ -11,7 +11,7 @@ func UpdateVehicle(c *gin.Context) {
 
 }
 
-func DesibleVehicle(c *gin.Context) {
+func FireVehicle(c *gin.Context) {
 	fmt.Println("DesibleVehicle")
 
 }
