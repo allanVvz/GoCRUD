@@ -2,62 +2,99 @@ package repository
 
 import (
 	"context"
-	"os"
+	"errors"
 
-	"github.com/allanVvz/GoCRUD/src/config/logger"
-	"github.com/allanVvz/GoCRUD/src/config/rest_err"
-	"github.com/allanVvz/GoCRUD/src/model"
-	"github.com/allanVvz/GoCRUD/src/model/repository/entity/converter"
+	"github.com/allanVvz/GoCRUD/src/controller/model/request"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.uber.org/zap"
 )
 
-// DriverRepository representa o repositório para o recurso Driver.
 type DriverRepository struct {
-	databaseConnection *mongo.Database
+	DB *mongo.Database
 }
 
-// NewDriverRepository cria uma nova instância de DriverRepository.
-func NewDriverRepository(dbConnection *mongo.Database) *DriverRepository {
-	return &DriverRepository{
-		databaseConnection: dbConnection,
-	}
+// Novo repositório
+func NewDriverRepository(db *mongo.Database) *DriverRepository {
+	return &DriverRepository{DB: db}
 }
 
-// CreateDriver insere um novo motorista no banco de dados.
-func (dr *DriverRepository) CreateDriver(
-	driverDomain model.Driver,
-) (model.Driver, *rest_err.RestErr) {
-	logger.Info("Init CreateDriver repository",
-		zap.String("journey", "createDriver"))
+// Salva um motorista diretamente no banco usando o request
+func (r *DriverRepository) SaveDriver(driver request.DriverRequest) (string, error) {
+	collection := r.DB.Collection("drivers")
 
-	// Nome da coleção
-	collectionName := os.Getenv("MONGODB_DRIVER_DB")
-	if collectionName == "" {
-		collectionName = "drivers" // Valor padrão caso a variável de ambiente não esteja configurada
+	// Converte o ID para ObjectID se for necessário
+	var objectID primitive.ObjectID
+	if driver.Id != "" {
+		var err error
+		objectID, err = primitive.ObjectIDFromHex(driver.Id)
+		if err != nil {
+			return "", errors.New("invalid ID format")
+		}
+	} else {
+		objectID = primitive.NewObjectID()
 	}
 
-	collection := dr.databaseConnection.Collection(collectionName)
+	// Documento para salvar no banco
+	entity := struct {
+		ID           primitive.ObjectID `bson:"_id,omitempty"`
+		Status       int8               `bson:"status"`
+		Name         string             `bson:"name"`
+		Rg           string             `bson:"rg"`
+		Registration string             `bson:"registration"`
+		Salary       float64            `bson:"salary"`
+	}{
+		ID:           objectID,
+		Status:       driver.Status,
+		Name:         driver.Name,
+		Rg:           driver.Rg,
+		Registration: driver.Registration,
+		Salary:       driver.Salary,
+	}
 
-	// Converte o domínio para a entidade MongoDB
-	entity := converter.ConvertDomainToEntity(driverDomain)
-
-	// Insere o documento na coleção
-	result, err := collection.InsertOne(context.Background(), entity)
+	// Insere no banco
+	_, err := collection.InsertOne(context.Background(), entity)
 	if err != nil {
-		logger.Error("Error trying to create driver", err,
-			zap.String("journey", "createDriver"))
-		return model.Driver{}, rest_err.NewInternalServerError(err.Error())
+		return "", err
 	}
 
-	// Atualiza o ID da entidade com o valor gerado pelo MongoDB
-	entity.ID = result.InsertedID.(primitive.ObjectID)
+	// Retorna o ID gerado
+	return objectID.Hex(), nil
+}
 
-	logger.Info("CreateDriver repository executed successfully",
-		zap.String("driverId", entity.ID.Hex()),
-		zap.String("journey", "createDriver"))
+// Busca um motorista pelo ID
+func (r *DriverRepository) FindDriverByID(id string) (request.DriverRequest, error) {
+	collection := r.DB.Collection("drivers")
 
-	// Converte a entidade de volta para o domínio e retorna
-	return converter.ConvertEntityToDomain(*entity), nil
+	// Converte o ID para ObjectID
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return request.DriverRequest{}, errors.New("invalid ID format")
+	}
+
+	// Busca o documento no banco
+	var entity struct {
+		ID           primitive.ObjectID `bson:"_id,omitempty"`
+		Status       int8               `bson:"status"`
+		Name         string             `bson:"name"`
+		Rg           string             `bson:"rg"`
+		Registration string             `bson:"registration"`
+		Salary       float64            `bson:"salary"`
+	}
+
+	err = collection.FindOne(context.Background(), struct {
+		ID primitive.ObjectID `bson:"_id"`
+	}{ID: objectID}).Decode(&entity)
+	if err != nil {
+		return request.DriverRequest{}, err
+	}
+
+	// Retorna o request preenchido
+	return request.DriverRequest{
+		Id:           entity.ID.Hex(),
+		Status:       entity.Status,
+		Name:         entity.Name,
+		Rg:           entity.Rg,
+		Registration: entity.Registration,
+		Salary:       entity.Salary,
+	}, nil
 }

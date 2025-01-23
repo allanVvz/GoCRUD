@@ -5,26 +5,36 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func InitRoutes(r *gin.RouterGroup) {
+func InitRoutes(router *gin.Engine, driverController *controller.DriverController) {
+	// Grupo de rotas para motoristas
+	drivers := router.Group("/drivers")
+	{
+		drivers.GET("/id/:driverId", controller.FindDriverById)
+		drivers.GET("/reg/:driverReg", controller.FindDriverByReg)
+		drivers.GET("/rg/:driverRg", controller.FindDriverByRg)
+		drivers.GET("/salary/:driverId", controller.GetSalary)
+		drivers.POST("/", driverController.CreateDriver)
+		drivers.PUT("/:driverId", controller.UpdateDriver)
+		drivers.DELETE("/:driverId", controller.FireDriver)
+	}
 
-	r.GET("/getDriver/Id/:DriverId", controller.FindDriverById)
-	r.GET("/getDriver/Reg/:DriverReg", controller.FindDriverByReg)
-	r.GET("/getDriver/Rg/:DriverRg", controller.FindDriverByRg)
-	r.GET("/getSalary/:DriverId", controller.GetSalary)
-	r.GET("/getVehicle/Id/:vehicleId", controller.FindVehicleById)
-	r.GET("/getVehicle/Model/:vehicleModel", controller.FindVehicleByModel)
-	r.GET("/getVehicle/Plate/:vehiclePlate", controller.FindVehicleByPlate)
-	r.GET("/getVehicle/Date/:vehicleYear", controller.FindVehicleByPurchaseDate)
-	r.GET("/getJourney/", controller.List2wJourneys)
-	r.GET("/getJourney/2w/", controller.ListJourneys)
+	// Grupo de rotas para veículos
+	vehicles := router.Group("/vehicles")
+	{
+		vehicles.GET("/id/:vehicleId", controller.FindVehicleById)
+		vehicles.GET("/model/:vehicleModel", controller.FindVehicleByModel)
+		vehicles.GET("/plate/:vehiclePlate", controller.FindVehicleByPlate)
+		vehicles.GET("/date/:vehicleYear", controller.FindVehicleByPurchaseDate)
+		vehicles.POST("/", controller.CreateVehicle)
+		vehicles.PUT("/:vehicleId", controller.UpdateVehicle)
+		vehicles.DELETE("/:vehicleId", controller.FireVehicle)
+	}
 
-	r.POST("/Driver", controller.createDriver)
-	r.POST("/Vehicles/", controller.CreateVehicle)
-	r.POST("/Journey/", controller.CreateJourney)
-
-	r.PUT("/updateDriver/:driverId", controller.UpdateDriver)
-	r.PUT("/updateVehicle/:driverId", controller.UpdateVehicle)
-	r.PUT("/deleteDriver/:driverId", controller.FireDriver)
-	r.PUT("/deleteVehicle/:vehicleId", controller.FireVehicle)
-
+	// Grupo de rotas para jornadas
+	journeys := router.Group("/journeys")
+	{
+		journeys.GET("/", controller.List2wJourneys)
+		journeys.GET("/2w", controller.ListJourneys)
+		journeys.POST("/", controller.CreateJourney)
+	}
 }

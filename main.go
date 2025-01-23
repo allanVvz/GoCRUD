@@ -1,30 +1,43 @@
 package main
 
 import (
-	"fmt"
+	"context"
 	"log"
-	"os"
+	"time"
 
-	"github.com/allanVvz/GoCRUD/src/config/logger"
+	"github.com/allanVvz/GoCRUD/src/controller"
 	"github.com/allanVvz/GoCRUD/src/controller/routes"
+	"github.com/allanVvz/GoCRUD/src/model/repository"
+	"github.com/allanVvz/GoCRUD/src/model/service"
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func main() {
-	logger.Info("Starting the application")
-	err := godotenv.Load()
+	// Conectar ao MongoDB
+	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
-		log.Fatal("Error loading .env file")
-
+		log.Fatalf("Failed to create MongoDB client: %v", err)
 	}
-	
+	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer cancel()
+	if err := client.Connect(ctx); err != nil {
+		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	}
+	db := client.Database("gocrud")
+
+	// Inicializar o repositório, serviço e controlador
+	driverRepository := repository.NewDriverRepository(db)
+	driverService := service.NewDriverService(driverRepository)
+	driverController := controller.NewDriverController(driverService)
+
+	// Inicializar o roteador
 	router := gin.Default()
+	routes.InitRoutes(router, driverController)
 
-	routes.InitRoutes(&router.RouterGroup)
-
+	// Iniciar o servidor
 	if err := router.Run(":8080"); err != nil {
-		fmt.Println("Error starting server")
-		os.Exit(1)
+		log.Fatalf("Failed to start server: %v", err)
 	}
 }
