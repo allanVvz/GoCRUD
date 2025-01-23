@@ -7,12 +7,12 @@ import (
 	"github.com/allanVvz/GoCRUD/src/config/validation"
 	"github.com/allanVvz/GoCRUD/src/controller/model/request"
 	"github.com/allanVvz/GoCRUD/src/controller/model/response"
-	"github.com/allanVvz/GoCRUD/src/model"
 	"github.com/gin-gonic/gin"
+	
 	"go.uber.org/zap"
 )
 
-func (dc *driverControllerInterface) CreateDriver(c *gin.Context) {
+func (dc *DriverController) CreateDriver(c *gin.Context) {
 	logger.Info("Init CreateDriver controller",
 		zap.String("journey", "createDriver"),
 	)
@@ -29,17 +29,8 @@ func (dc *driverControllerInterface) CreateDriver(c *gin.Context) {
 		return
 	}
 
-	// Criação do domínio do motorista
-	domain := model.NewDriverDomain(
-		driverRequest.Id,
-		driverRequest.Name,
-		driverRequest.Rg,
-		driverRequest.Registration,
-		driverRequest.Salary,
-	)
-
-	// Chamando o serviço para criar o motorista
-	domainResult, err := dc.service.CreateDriverServices(domain)
+	// Chamando o serviço para criar o motorista diretamente com o request
+	driverResult, err := dc.Service.CreateDriver(driverRequest)
 	if err != nil {
 		logger.Error("Error trying to call CreateDriver service", err,
 			zap.String("journey", "createDriver"))
@@ -48,15 +39,15 @@ func (dc *driverControllerInterface) CreateDriver(c *gin.Context) {
 	}
 
 	logger.Info("CreateDriver controller executed successfully",
-		zap.String("driverId", domainResult.GetID()),
+		zap.String("driverId", driverResult.Id),
 		zap.String("journey", "createDriver"))
 
 	// Retornando o objeto criado ao cliente
 	c.JSON(http.StatusCreated, response.DriverResponse{
-		Id:           domainResult.GetID(),
-		Name:         domainResult.GetName(),
-		Rg:           domainResult.GetRg(),
-		Registration: domainResult.GetRegistration(),
-		Salary:       domainResult.GetSalary(),
+		Id:           driverResult.Id,
+		Name:         driverResult.Name,
+		Rg:           driverResult.Rg,
+		Registration: driverResult.Registration,
+		Salary:       driverResult.Salary,
 	})
 }

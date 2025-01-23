@@ -18,7 +18,7 @@ func InitRoutes(r *gin.RouterGroup) {
 	r.GET("/getJourney/", controller.List2wJourneys)
 	r.GET("/getJourney/2w/", controller.ListJourneys)
 
-	r.POST("/Driver", controller.CreateDriver)
+	r.POST("/Driver", controller.createDriver)
 	r.POST("/Vehicles/", controller.CreateVehicle)
 	r.POST("/Journey/", controller.CreateJourney)
 
