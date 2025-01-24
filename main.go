@@ -16,14 +16,14 @@ import (
 
 func main() {
 	// Conectar ao MongoDB
-	client, err := mongo.NewClient(options.Client().ApplyURI("mongodb://localhost:27017"))
+	client, err := mongo.Connect(context.Background(), options.Client().ApplyURI("mongodb://localhost:27017"))
 	if err != nil {
 		log.Fatalf("Failed to create MongoDB client: %v", err)
 	}
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
-	if err := client.Connect(ctx); err != nil {
-		log.Fatalf("Failed to connect to MongoDB: %v", err)
+	if err := client.Ping(ctx, nil); err != nil {
+		log.Fatalf("Failed to ping MongoDB: %v", err)
 	}
 	db := client.Database("gocrud")
 
