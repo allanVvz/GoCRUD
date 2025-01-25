@@ -1,32 +1,37 @@
 package service
 
 import (
-	"errors"
-
-	"github.com/allanVvz/GoCRUD/src/model/repository"
+	"github.com/allanVvz/GoCRUD/src/config/logger"
+	"github.com/allanVvz/GoCRUD/src/config/rest_err"
+	"go.uber.org/zap"
 )
 
-type DriverService struct {
-	Repo *repository.DriverRepository
-}
+func (s *DriverService) UpdateDriverStatus(driverID string) *rest_err.RestErr {
+	logger.Info("Starting UpdateDriverStatus service", zap.String("driverID", driverID))
 
-func (s *DriverService) UpdateDriverStatus(driverID string) error {
 	// Busca o motorista pelo ID
 	driver, err := s.Repo.FindDriverByID(driverID)
 	if err != nil {
-		return errors.New("driver not found")
+		logger.Error("Error finding driver in UpdateDriverStatus", err, zap.String("driverID", driverID))
+		if err.Error() == "driver not found" {
+			return rest_err.NewNotFoundError("Driver not found")
+		}
+		return rest_err.NewInternalServerError("Error finding driver")
 	}
 
-	// Verifica se o status já é 1
-	if driver.Status == 1 {
-		return errors.New("driver status is already 1")
+	// Verifica se o status já é 0
+	if !driver.Status {
+		logger.Info("Driver status is already 0, no update needed", zap.String("driverID", driverID))
+		return rest_err.NewBadRequestError("Driver status is already inactive (0)")
 	}
 
-	// Atualiza o status para 1
-	err = s.Repo.UpdateDriverStatus(driverID, 1)
+	// Atualiza o status para 0
+	err = s.Repo.UpdateDriverStatus(driverID, false)
 	if err != nil {
-		return errors.New("failed to update driver status")
+		logger.Error("Error updating driver status in UpdateDriverStatus", err, zap.String("driverID", driverID))
+		return rest_err.NewInternalServerError("Error updating driver status")
 	}
 
+	logger.Info("Driver status updated successfully", zap.String("driverID", driverID))
 	return nil
 }

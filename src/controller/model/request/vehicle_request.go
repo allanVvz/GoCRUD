@@ -2,7 +2,7 @@ package request
 
 type VehicleRequest struct {
 	Id       string  `json:"id" binding:"required,min=1,max=999"`
-	Status   int8    `json:"status" binding:"required,min=1,max=2"`
+	Status   bool    `json:"status" binding:"required,min=1,max=2"`
 	DriverId string  `json:"driver_id" binding:"required,min=1,max=999"`
 	Model    string  `json:"model" binding:"required,min=1,max=99"`
 	Brand    string  `json:"brand" binding:"required,min=1,max=99"`

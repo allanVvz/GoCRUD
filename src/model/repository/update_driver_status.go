@@ -3,27 +3,28 @@ package repository
 import (
 	"context"
 
+	"github.com/allanVvz/GoCRUD/src/config/rest_err"
 	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-type DriverRepository struct {
-	DB *mongo.Database
-}
-
-func (r *DriverRepository) UpdateDriverStatus(driverID string, newStatus int8) error {
+func (r *DriverRepository) UpdateDriverStatus(driverID string, newStatus bool) *rest_err.RestErr {
 	collection := r.DB.Collection("drivers")
 
-	// Cria o filtro para buscar o motorista pelo ID
-	filter := bson.M{"_id": driverID}
+	// Convert driverID to ObjectID
+	objectID, err := primitive.ObjectIDFromHex(driverID)
+	if err != nil {
+		return rest_err.NewBadRequestError("Invalid driver ID format")
+	}
 
-	// Define o update para alterar o status
+	// Define the filter and update
+	filter := bson.M{"_id": objectID}
 	update := bson.M{"$set": bson.M{"status": newStatus}}
 
-	// Atualiza o motorista no banco
-	_, err := collection.UpdateOne(context.Background(), filter, update)
+	// Execute the update
+	_, err = collection.UpdateOne(context.Background(), filter, update)
 	if err != nil {
-		return err
+		return rest_err.NewInternalServerError("Failed to update driver status")
 	}
 
 	return nil

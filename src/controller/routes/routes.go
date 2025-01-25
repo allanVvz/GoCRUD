@@ -14,8 +14,8 @@ func InitRoutes(router *gin.Engine, driverController *controller.DriverControlle
 		drivers.GET("/rg/:driverRg", controller.FindDriverByRg)
 		drivers.GET("/salary/:driverId", controller.GetSalary)
 		drivers.POST("/", driverController.CreateDriver)
-		drivers.PUT("/:driverId", controller.UpdateDriver)
-		drivers.DELETE("/:driverId", controller.FireDriver)
+		drivers.PUT("/:driverId", driverController.UpdateDriver)
+		//drivers.DELETE("/:driverId", driverController.FireDriver)
 	}
 
 	// Grupo de rotas para veículos

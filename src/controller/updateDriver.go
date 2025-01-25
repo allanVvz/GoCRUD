@@ -4,7 +4,6 @@ import (
 	"net/http"
 
 	"github.com/allanVvz/GoCRUD/src/config/logger"
-	"github.com/allanVvz/GoCRUD/src/model/service"
 	"github.com/gin-gonic/gin"
 	"go.uber.org/zap"
 )
@@ -17,13 +16,13 @@ func (dc *DriverController) UpdateDriver(c *gin.Context) {
 	// Obter o ID do motorista a partir dos parâmetros da URL
 	driverID := c.Param("driverId")
 	if driverID == "" {
-		logger.Error("Driver ID is missing in UpdateDriver")
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Driver ID is required"})
 		return
 	}
 
 	// Chama o serviço para atualizar o status do motorista
 	err := dc.Service.UpdateDriverStatus(driverID)
+
 	if err != nil {
 		logger.Error("Error updating driver status", err,
 			zap.String("journey", "updateDriver"),
