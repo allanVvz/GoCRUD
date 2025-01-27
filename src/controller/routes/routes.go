@@ -9,7 +9,7 @@ func InitRoutes(router *gin.Engine, driverController *controller.DriverControlle
 	// Grupo de rotas para motoristas
 	drivers := router.Group("/drivers")
 	{
-		drivers.GET("/id/:driverId", controller.FindDriverById)
+		drivers.GET("/id/:driverId", driverController.FindDriverById)
 		drivers.GET("/reg/:driverReg", controller.FindDriverByReg)
 		drivers.GET("/rg/:driverRg", controller.FindDriverByRg)
 		drivers.GET("/salary/:driverId", controller.GetSalary)
