@@ -25,10 +25,14 @@ func (r *DriverRepository) FindDriverByID(id string) (request.DriverRequest, *re
 	// Define o filtro para buscar o documento pelo _id
 	filter := bson.M{"_id": objectID}
 
-	// Define uma estrutura para armazenar os dados do documento
+	// Define uma estrutura para armazenar todos os dados do motorista
 	var entity struct {
-		ID     primitive.ObjectID `bson:"_id,omitempty"`
-		Status bool               `bson:"status"`
+		ID           primitive.ObjectID `bson:"_id,omitempty"`
+		Status       bool               `bson:"status"`
+		Name         string             `bson:"name"`
+		Rg           string             `bson:"rg"`
+		Registration string             `bson:"registration"`
+		Salary       float64            `bson:"salary"`
 	}
 
 	// Executa a busca no MongoDB
@@ -43,10 +47,14 @@ func (r *DriverRepository) FindDriverByID(id string) (request.DriverRequest, *re
 		return request.DriverRequest{}, rest_err.NewInternalServerError("Error finding driver")
 	}
 
-	// Converte o documento encontrado em um objeto request.DriverRequest
+	// Preenche a struct request.DriverRequest com os dados encontrados
 	driver := request.DriverRequest{
-		Id:     entity.ID.Hex(),
-		Status: entity.Status,
+		Id:           entity.ID.Hex(),
+		Status:       entity.Status,
+		Name:         entity.Name,
+		Rg:           entity.Rg,
+		Registration: entity.Registration,
+		Salary:       entity.Salary,
 	}
 
 	logger.Info("Driver found successfully in FindDriverByID", zap.String("driverId", driver.Id))
