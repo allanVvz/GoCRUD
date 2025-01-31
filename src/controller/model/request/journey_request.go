@@ -1,6 +1,7 @@
 package request
 
 type JourneyRequest struct {
+	Id              string  `json:"id" binding:"required" min:"1" max:"999"`
 	DriverID        string  `json:"driver_id" binding:"required" min:"1" max:"999"`
 	VehicleID       string  `json:"vehicle_id" binding:"required" min:"1" max:"999"`
 	InitialDate     string  `json:"initial_date" binding:"required" date:"true"`
