@@ -12,20 +12,11 @@ import (
 	"go.uber.org/zap"
 )
 
-func (r *DriverRepository) FindDriverByID(id string) (request.DriverRequest, *rest_err.RestErr) {
+// findDriver busca um motorista no banco de dados com um filtro específico.
+func (r *DriverRepository) findDriver(filter bson.M) (request.DriverRequest, *rest_err.RestErr) {
 	collection := r.DB.Collection("drivers")
 
-	// Converte o ID para ObjectID
-	objectID, err := primitive.ObjectIDFromHex(id)
-	if err != nil {
-		logger.Error("Invalid ID format in FindDriverByID", err, zap.String("driverId", id))
-		return request.DriverRequest{}, rest_err.NewBadRequestError("Invalid ID format")
-	}
-
-	// Define o filtro para buscar o documento pelo _id
-	filter := bson.M{"_id": objectID}
-
-	// Define uma estrutura para armazenar todos os dados do motorista
+	// Estrutura para armazenar os dados do motorista
 	var entity struct {
 		ID           primitive.ObjectID `bson:"_id,omitempty"`
 		Status       bool               `bson:"status"`
@@ -36,14 +27,14 @@ func (r *DriverRepository) FindDriverByID(id string) (request.DriverRequest, *re
 	}
 
 	// Executa a busca no MongoDB
-	err = collection.FindOne(context.Background(), filter).Decode(&entity)
+	err := collection.FindOne(context.Background(), filter).Decode(&entity)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			logger.Info("Driver not found in FindDriverByID", zap.String("driverId", id))
+			logger.Info("Driver not found", zap.Any("filter", filter))
 			return request.DriverRequest{}, rest_err.NewNotFoundError("Driver not found")
 		}
 
-		logger.Error("Error finding driver in FindDriverByID", err, zap.String("driverId", id))
+		logger.Error("Error finding driver", err, zap.Any("filter", filter))
 		return request.DriverRequest{}, rest_err.NewInternalServerError("Error finding driver")
 	}
 
@@ -57,6 +48,27 @@ func (r *DriverRepository) FindDriverByID(id string) (request.DriverRequest, *re
 		Salary:       entity.Salary,
 	}
 
-	logger.Info("Driver found successfully in FindDriverByID", zap.String("driverId", driver.Id))
+	logger.Info("Driver found successfully", zap.Any("filter", filter))
 	return driver, nil
+}
+
+// FindDriverByID busca um motorista pelo ID.
+func (r *DriverRepository) FindDriverByID(id string) (request.DriverRequest, *rest_err.RestErr) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		logger.Error("Invalid ID format", err, zap.String("driverId", id))
+		return request.DriverRequest{}, rest_err.NewBadRequestError("Invalid ID format")
+	}
+
+	return r.findDriver(bson.M{"_id": objectID})
+}
+
+// FindDriverByReg busca um motorista pelo registro.
+func (r *DriverRepository) FindDriverByReg(registration string) (request.DriverRequest, *rest_err.RestErr) {
+	return r.findDriver(bson.M{"registration": registration})
+}
+
+// FindDriverByRg busca um motorista pelo RG.
+func (r *DriverRepository) FindDriverByRg(rg string) (request.DriverRequest, *rest_err.RestErr) {
+	return r.findDriver(bson.M{"rg": rg})
 }

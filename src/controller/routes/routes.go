@@ -9,22 +9,15 @@ func InitRoutes(router *gin.Engine, driverController *controller.DriverControlle
 	// Grupo de rotas para motoristas
 	drivers := router.Group("/drivers")
 	{
-		drivers.GET("/id/:driverId", driverController.FindDriverById)
-		drivers.GET("/reg/:driverReg", controller.FindDriverByReg)
-		drivers.GET("/rg/:driverRg", controller.FindDriverByRg)
-		drivers.GET("/salary/:driverId", controller.GetSalary)
+		drivers.GET("/", driverController.FindDriver) // Usa query parameters para buscar por ID, REG ou RG
 		drivers.POST("/", driverController.CreateDriver)
 		drivers.PUT("/:driverId", driverController.UpdateDriver)
-		//drivers.DELETE("/:driverId", driverController.FireDriver)
 	}
 
 	// Grupo de rotas para veículos
 	vehicles := router.Group("/vehicles")
 	{
-		vehicles.GET("/id/:vehicleId", controller.FindVehicleById)
-		vehicles.GET("/model/:vehicleModel", controller.FindVehicleByModel)
-		vehicles.GET("/plate/:vehiclePlate", controller.FindVehicleByPlate)
-		vehicles.GET("/date/:vehicleYear", controller.FindVehicleByPurchaseDate)
+		//vehicles.GET("/", controller.FindVehicle) // Usa query parameters para buscar veículos por ID, Modelo, Placa ou Ano
 		vehicles.POST("/", controller.CreateVehicle)
 		vehicles.PUT("/:vehicleId", controller.UpdateVehicle)
 		vehicles.DELETE("/:vehicleId", controller.FireVehicle)
@@ -33,8 +26,7 @@ func InitRoutes(router *gin.Engine, driverController *controller.DriverControlle
 	// Grupo de rotas para jornadas
 	journeys := router.Group("/journeys")
 	{
-		journeys.GET("/", controller.List2wJourneys)
-		journeys.GET("/2w", controller.ListJourneys)
+		journeys.GET("/", controller.ListJourneys) // Usa query parameters para diferenciar tipos de jornada
 		journeys.POST("/", controller.CreateJourney)
 	}
 }
