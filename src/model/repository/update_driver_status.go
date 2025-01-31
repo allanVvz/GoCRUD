@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
-func (r *DriverRepository) UpdateDriverStatus(driverID string, newStatus bool) *rest_err.RestErr {
+func (r *DriverRepository) FireDriver(driverID string, newStatus bool) *rest_err.RestErr {
 	collection := r.DB.Collection("drivers")
 
 	// Convert driverID to ObjectID

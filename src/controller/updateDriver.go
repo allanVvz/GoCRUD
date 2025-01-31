@@ -21,7 +21,7 @@ func (dc *DriverController) UpdateDriver(c *gin.Context) {
 	}
 
 	// Chama o serviço para atualizar o status do motorista
-	err := dc.Service.UpdateDriverStatus(driverID)
+	err := dc.Service.FireDriver(driverID)
 
 	if err != nil {
 		logger.Error("Error updating driver status", err,

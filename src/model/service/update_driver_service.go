@@ -6,7 +6,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func (s *DriverService) UpdateDriverStatus(driverID string) *rest_err.RestErr {
+func (s *DriverService) FireDriver(driverID string) *rest_err.RestErr {
 	logger.Info("Starting UpdateDriverStatus service", zap.String("driverID", driverID))
 
 	// Busca o motorista pelo ID
@@ -26,7 +26,7 @@ func (s *DriverService) UpdateDriverStatus(driverID string) *rest_err.RestErr {
 	}
 
 	// Atualiza o status para 0
-	err = s.Repo.UpdateDriverStatus(driverID, false)
+	err = s.Repo.FireDriver(driverID, false)
 	if err != nil {
 		logger.Error("Error updating driver status in UpdateDriverStatus", err, zap.String("driverID", driverID))
 		return rest_err.NewInternalServerError("Error updating driver status")
